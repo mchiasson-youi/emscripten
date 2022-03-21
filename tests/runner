@@ -11,6 +11,8 @@
 # To make modifications to this file, edit `tools/run_python.sh` and then run
 # `tools/create_entry_points.py`
 
+export PYTHONPATH=$PYTHONPATH:$(dirname $0)/../.pip
+
 if [ -z "$PYTHON" ]; then
   PYTHON=$EMSDK_PYTHON
 fi

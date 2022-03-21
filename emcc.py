@@ -1374,7 +1374,7 @@ def phase_setup(options, state, newargs, user_settings):
       input_files.append((i, arg))
       newargs[i] = ''
 
-  if not input_files and not state.link_flags:
+  if not input_files: # and not state.link_flags:
     exit_with_error('no input files')
 
   newargs = [a for a in newargs if a]

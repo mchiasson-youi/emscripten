@@ -8,6 +8,8 @@
 :: All env. vars specified in this file are to be local only to this script.
 @setlocal
 
+@set PYTHONPATH=%PYTHONPATH%;%EMSCRIPTEN_ROOT%\.pip
+
 @set EM_PY=%EMSDK_PYTHON%
 @if "%EM_PY%"=="" (
   set EM_PY=python

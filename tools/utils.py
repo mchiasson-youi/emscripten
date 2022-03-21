@@ -93,3 +93,9 @@ def write_binary(file_path, contents):
   """Write to a file opened in binary mode"""
   with open(file_path, 'wb') as fh:
     fh.write(contents)
+
+
+try:
+  import leb128  # noqa
+except ImportError:
+  exit_with_error('unable to import `leb128`.  Did you run `pip install -r requirements.txt`?"')

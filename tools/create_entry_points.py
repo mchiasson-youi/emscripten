@@ -54,36 +54,44 @@ entry_remap = {
 }
 
 tools_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(tools_dir)
+
+
+def generate_entry_points(cmd, path):
+  sh_file = path + '.sh'
+  bat_file = path + '.bat'
+  with open(sh_file) as f:
+    sh_file = f.read()
+  with open(bat_file) as f:
+    bat_file = f.read()
+
+  for entry_point in cmd:
+    sh_data = sh_file
+    bat_data = bat_file
+    if entry_point in entry_remap:
+      sh_data = sh_data.replace('$0', '$(dirname $0)/' + entry_remap[entry_point])
+      bat_data = bat_data.replace('%~n0', entry_remap[entry_point].replace('/', '\\'))
+    root = '$(dirname $0)'
+    bat_root = '%~dp0'
+    if os.path.dirname(entry_point):
+      root += '/..'
+      bat_root += '\\..'
+    sh_data = sh_data.replace('$EMSCRIPTEN_ROOT', root)
+    bat_data = bat_data.replace('%EMSCRIPTEN_ROOT%', bat_root)
+
+    out_sh_file = os.path.join(root_dir, entry_point)
+    with open(out_sh_file, 'w') as f:
+      f.write(sh_data)
+    os.chmod(out_sh_file, stat.S_IMODE(os.stat(out_sh_file).st_mode) | stat.S_IXUSR)
+
+    with open(os.path.join(root_dir, entry_point + '.bat'), 'w') as f:
+      f.write(bat_data)
 
 
 def main():
-  root_dir = os.path.dirname(tools_dir)
-
-  def generate_entry_points(cmd, path):
-    sh_file = path + '.sh'
-    bat_file = path + '.bat'
-    with open(sh_file) as f:
-      sh_file = f.read()
-    with open(bat_file) as f:
-      bat_file = f.read()
-
-    for entry_point in cmd:
-      sh_data = sh_file
-      bat_data = bat_file
-      if entry_point in entry_remap:
-        sh_data = sh_data.replace('$0', '$(dirname $0)/' + entry_remap[entry_point])
-        bat_data = bat_data.replace('%~n0', entry_remap[entry_point].replace('/', '\\'))
-
-      out_sh_file = os.path.join(root_dir, entry_point)
-      with open(out_sh_file, 'w') as f:
-        f.write(sh_data)
-      os.chmod(out_sh_file, stat.S_IMODE(os.stat(out_sh_file).st_mode) | stat.S_IXUSR)
-
-      with open(os.path.join(root_dir, entry_point + '.bat'), 'w') as f:
-        f.write(bat_data)
-
   generate_entry_points(entry_points, os.path.join(tools_dir, 'run_python'))
   generate_entry_points(compiler_entry_points, os.path.join(tools_dir, 'run_python_compiler'))
+  return 0
 
 
 if __name__ == '__main__':
