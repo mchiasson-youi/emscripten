@@ -443,18 +443,18 @@ long __syscall_open(const char* path, long flags, ...) {
     switch (flags & O_ACCMODE)
     {
         case O_RDONLY:
-        case O_RDWR:
+            max |= __WASI_RIGHTS_FD_READ | __WASI_RIGHTS_FD_READDIR;
+            break;
         case O_WRONLY:
-            if ((flags & O_RDONLY) != 0) 
-            {
-                max |= __WASI_RIGHTS_FD_READ | __WASI_RIGHTS_FD_READDIR;
-            }
-            if ((flags & O_WRONLY) != 0)
-            {
-                max |=  __WASI_RIGHTS_FD_DATASYNC | __WASI_RIGHTS_FD_WRITE |
-                        __WASI_RIGHTS_FD_ALLOCATE |
-                        __WASI_RIGHTS_FD_FILESTAT_SET_SIZE;
-            }
+            max |=  __WASI_RIGHTS_FD_DATASYNC | __WASI_RIGHTS_FD_WRITE |
+                    __WASI_RIGHTS_FD_ALLOCATE |
+                    __WASI_RIGHTS_FD_FILESTAT_SET_SIZE;
+            break;
+        case O_RDWR:
+            max |=  __WASI_RIGHTS_FD_READ | __WASI_RIGHTS_FD_READDIR |
+                    __WASI_RIGHTS_FD_DATASYNC | __WASI_RIGHTS_FD_WRITE |
+                    __WASI_RIGHTS_FD_ALLOCATE |
+                    __WASI_RIGHTS_FD_FILESTAT_SET_SIZE;
             break;
         case O_EXEC:
             break;
@@ -483,40 +483,40 @@ long __syscall_open(const char* path, long flags, ...) {
 
     // Open file with appropriate rights.
     __wasi_fdflags_t fs_flags = 0;
-    if (flags & O_APPEND)
+    if ((flags & O_APPEND) != 0)
     {
         fs_flags |= __WASI_FDFLAGS_APPEND;
     }
-    if (flags & O_DSYNC)
+    if ((flags & O_DSYNC) != 0)
     {
         fs_flags |= __WASI_FDFLAGS_DSYNC;
     }
-    if (flags & O_NONBLOCK)
+    if ((flags & O_NONBLOCK) != 0)
     {
         fs_flags |= __WASI_FDFLAGS_NONBLOCK;
     }
-    if (flags & O_RSYNC)
+    if ((flags & O_RSYNC) != 0)
     {
         fs_flags |= __WASI_FDFLAGS_RSYNC;
     }
-    if (flags & O_SYNC)
+    if ((flags & O_SYNC) != 0)
     {
         fs_flags |= __WASI_FDFLAGS_SYNC;
     }
     __wasi_oflags_t o_flags = 0;
-    if(flags & O_CREAT)
+    if((flags & O_CREAT) != 0)
     {
         o_flags |= __WASI_OFLAGS_CREAT;
     }
-    if(flags & O_DIRECTORY)
+    if((flags & O_DIRECTORY) != 0)
     {
         o_flags |= __WASI_OFLAGS_DIRECTORY;
     }
-    if(flags & O_EXCL)
+    if((flags & O_EXCL) != 0)
     {
         o_flags |= __WASI_OFLAGS_EXCL;
     }
-    if(flags & O_TRUNC)
+    if((flags & O_TRUNC) != 0)
     {
         o_flags |= __WASI_OFLAGS_TRUNC;
     }
